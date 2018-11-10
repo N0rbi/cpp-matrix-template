@@ -19,6 +19,8 @@ template<class T>
 struct const_mult_container {
     T value;
 
+    const_mult_container(T val) : value(val){};
+
     T operator()(const std::size_t i, size_t j) const{
       return (i == j) ? value : 0;
     }
@@ -27,6 +29,8 @@ struct const_mult_container {
 template<class T>
 struct const_sum_container {
     T value;
+
+    const_sum_container(T val) : value(val){};
 
     T operator()(const std::size_t i, size_t j) const{
       return value;
@@ -122,8 +126,21 @@ public:
     return my_matrix<T, N, M, sum_container<T, Cont, Other_cont> > (sum_container<T, Cont, Other_cont>(this->data(), other.data()));
   }
 
-  my_matrix<T, N, M, sum_container<T, Cont, Other_cont> > operator+(const T other){
-    return my_matrix<T, N, M, sum_container<T, Cont, Other_cont> > (sum_container<T, Cont, Other_cont>(this->data(), const_sum_container<T>(other)));
+  template<class Other_cont>
+  my_matrix<T, N, M, sum_container<T, Cont, Other_cont> > operator+(const my_matrix<T, N, M, Other_cont>& other) const{
+    return my_matrix<T, N, M, sum_container<T, Cont, Other_cont> > (sum_container<T, Cont, Other_cont>(this->data(), other.data()));
+  }
+
+  my_matrix<T, N, M, sum_container<T, Cont, const_sum_container<T> > > operator+(const T& other) {
+    return this->operator+(my_matrix<T, N, M, const_sum_container<T> >(const_sum_container<T>(other)));
+  }
+
+  my_matrix<T, N, M, sum_container<T, Cont, const_sum_container<T> > > operator+(const T& other) const {
+    return this->operator+(my_matrix<T, N, M, const_sum_container<T> >(const_sum_container<T>(other)));
+  }
+
+  friend my_matrix<T, N, M, sum_container<T, Cont, const_sum_container<T> > > operator+(const T c, const my_matrix<T, N, M, Cont>& mtx) {
+    return mtx.operator+(c);
   }
 
   template<class Other_cont>
@@ -131,8 +148,13 @@ public:
     return my_matrix<T, N, M, neg_container<T, Cont, Other_cont> > (neg_container<T, Cont, Other_cont>(this->data(), other.data()));
   }
 
-  my_matrix<T, N, M, neg_container<T, Cont, Other_cont> > operator-(const T other){
-    return my_matrix<T, N, M, neg_container<T, Cont, Other_cont> > (neg_container<T, Cont, Other_cont>(this->data(), const_sum_container<T>(other)));
+  template<class Other_cont>
+  my_matrix<T, N, M, neg_container<T, Cont, Other_cont> > operator-(const my_matrix<T, N, M, Other_cont>& other) const {
+    return my_matrix<T, N, M, neg_container<T, Cont, Other_cont> > (neg_container<T, Cont, Other_cont>(this->data(), other.data()));
+  }
+
+  my_matrix<T, N, M, neg_container<T, Cont, const_sum_container<T> > > operator-(const T other){
+    return this->operator-(my_matrix<T, N, M, const_sum_container<T> >(const_sum_container<T>(other)));
   }
 
   template<size_t K, class Other_cont>
@@ -140,8 +162,8 @@ public:
     return my_matrix<T, N, K, mul_container<T, Cont, Other_cont, M> > (mul_container<T, Cont, Other_cont, M>(this->data(), other.data()));
   }
 
-  my_matrix<T, N, K, mul_container<T, Cont, Other_cont, M> > operator*(const T other){
-    return my_matrix<T, N, K, mul_container<T, Cont, Other_cont, M> > (mul_container<T, Cont, Other_cont, M>(this->data(), const_mult_container<T>(other)));
+  my_matrix<T, N, M, mul_container<T, Cont, const_mult_container<T>, M> > operator*(const T other){
+    return this->operator*(my_matrix<T, N, M, const_mult_container<T> >(const_mult_container<T>(other)));
   }
 };
 
@@ -156,12 +178,10 @@ int main() {
         for (size_t j=0; j<2; j++) {
             mtx1(i,j) = 1;
             mtx2(i,j) = 2;
-            mtx3(i,j) = 1;
+            mtx3(i,j) = 3;
         }
     }
 
-    mtx1 = mtx1 * 4;
-    mtx2 = mtx2 - 2;
 
     for (size_t i=0; i<2; i++) {
         for (size_t j=0; j<2; j++) {
@@ -179,7 +199,7 @@ int main() {
         }
         cout << endl;
 
-        mtx1 = mtx1 - mtx2;
+        mtx1 = 10 + mtx1;
 
         for (size_t i=0; i<2; i++) {
             for (size_t j=0; j<2; j++) {
