@@ -14,7 +14,7 @@ struct simple_container {
     /**
     visszaadunk egy konstans referenciat a tarolo (i,j). elemere
     */
-    const T operator()(int i,  int j) const{
+    const T& operator()(int i,  int j) const{
       return items[i][j];
     }
 
@@ -36,6 +36,9 @@ struct const_mult_container {
     szorzo
     */
     T value;
+    /**
+    szorzando matrix
+    */
     EXPR1 expr1;
 
     /**
@@ -154,6 +157,9 @@ elem sem lehet kulonbozo 0-nal.
 template<class T,  class EXPR1, class EXPR2>
 struct mul_container <T, EXPR1, EXPR2, 0> {
 
+  /**
+  konstruktor
+  */
   mul_container(const EXPR1& a, const EXPR2& b){}
 
   /**
@@ -205,14 +211,14 @@ public:
   (i,j). elem konstans referencia szerinti lekerese
   */
   const T& operator()(int i, int j) const{
-    return cont(i,j);
+    return this->cont(i,j);
   }
 
   /**
   (i,j). elem referencia szerinti lekerese
   */
   T& operator()(int i, int j) {
-    return cont(i,j);
+    return this->cont(i,j);
   }
 
   /**
@@ -339,7 +345,12 @@ int main(int argc, char const *argv[]) {
  fillMtx(b, 8);
  e(0,0)= 100;
 
- e = a*ab*2*b - e;
- printMtx(e);
+ a(0,0) = 1;
+ a(0,1) = 4;
+ b(0,0) = 6;
+ b(1,0) = 10;
+
+ ab = ab*2 - ab * b * a * ab;
+ printMtx(ab);
  return 0;
 }
