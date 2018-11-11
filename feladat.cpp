@@ -1,12 +1,17 @@
-#include <iostream>
-class matrix_base {
+// #include <iostream>
+// class matrix_base {
+//
+// public:
+//   matrix_base() {
+//     std::cout << "hi" << '\n';
+//   }
+// };
 
-public:
-  matrix_base() {
-    std::cout << "hi" << '\n';
-  }
-};
 
+/**
+Segito osztály belso szamitasokra (csak igy birtam elerni hogy a virtualis
+osztalyok ne a my_matrix-ot peldanyositsak, hanem ezt)
+*/
 template<class T, int N, int M, class Cont >
 class helper;
 
@@ -216,6 +221,9 @@ public:
     return *this;
   }
 
+  /**
+  Egy virtualis muvelet fat atalakit matrixsza
+  */
   template<class Cont2>
   my_matrix& operator=(const helper<T, N, M, Cont2>& other){
     for (int i = 0; i < N; ++i)
@@ -326,7 +334,7 @@ public:
   /**
   virtualis szorzas konstans es matrix kozott
   */
-  friend helper<T, N, M, const_mult_container<T, Cont> > operator*(const T c, const helper<T, N, M, Cont>& mtx) {
+  friend helper<T, N, M, const_mult_container<T, Cont> > operator*(const T c, const my_matrix<T, N, M, Cont>& mtx) {
     return mtx.operator*(c);
   }
 
@@ -517,6 +525,9 @@ public:
     return mtx.operator*(c);
   }
 
+  /**
+  virtualis osszeadas matrixok kozott
+  */
   template<class Other_cont>
   helper<T, N, M, sum_container<T, Cont, Other_cont> > operator+(const my_matrix<T, N, M, Other_cont>& other){
     return helper<T, N, M, sum_container<T, Cont, Other_cont> > (sum_container<T, Cont, Other_cont>(this->data(), other.data()));
@@ -564,44 +575,44 @@ public:
 };
 
 
-template<class T, int N, int M>
-void printMtx(const my_matrix<T,N,M> &mtx) {
-    for (int i = 0; i < N;i++) {
-      for (int j = 0; j < M;j++) {
-         std::cout << mtx(i,j) << '\t';
-      }
-      std::cout << '\n';
-    }
-}
-
-template<class T, int N, int M>
-void fillMtx(my_matrix<T,N,M> &mtx, T a) {
-    for (int i = 0; i < N;i++) {
-      for (int j = 0; j < M;j++) {
-         mtx(i,j) = a;
-      }
-    }
-}
-
-int main(int argc, char const *argv[]) {
- my_matrix<int, 1,2> a;
- my_matrix<int, 2,2> ab;
- my_matrix<int, 2,1> b;
- my_matrix<int, 1,3> c;
- my_matrix<int, 3,1> d;
- my_matrix<int, 1,1> e;
-
- fillMtx(ab, 5);
- fillMtx(a, 4);
- fillMtx(b, 8);
- e(0,0)= 100;
-
- a(0,0) = 1;
- a(0,1) = 4;
- b(0,0) = 6;
- b(1,0) = 10;
-
- ab = ab*2 - ab * b * a * ab + b*a;
- printMtx(ab);
- return 0;
-}
+// template<class T, int N, int M>
+// void printMtx(const my_matrix<T,N,M> &mtx) {
+//     for (int i = 0; i < N;i++) {
+//       for (int j = 0; j < M;j++) {
+//          std::cout << mtx(i,j) << '\t';
+//       }
+//       std::cout << '\n';
+//     }
+// }
+//
+// template<class T, int N, int M>
+// void fillMtx(my_matrix<T,N,M> &mtx, T a) {
+//     for (int i = 0; i < N;i++) {
+//       for (int j = 0; j < M;j++) {
+//          mtx(i,j) = a;
+//       }
+//     }
+// }
+//
+// int main(int argc, char const *argv[]) {
+//  my_matrix<int, 1,2> a;
+//  my_matrix<int, 2,2> ab;
+//  my_matrix<int, 2,1> b;
+//  my_matrix<int, 1,3> c;
+//  my_matrix<int, 3,1> d;
+//  my_matrix<int, 1,1> e;
+//
+//  fillMtx(ab, 5);
+//  fillMtx(a, 4);
+//  fillMtx(b, 8);
+//  e(0,0)= 100;
+//
+//  a(0,0) = 1;
+//  a(0,1) = 4;
+//  b(0,0) = 6;
+//  b(1,0) = 10;
+//
+//  ab = 3*ab*2 - ab * b * a * ab + ab-ab + b*a;
+//  printMtx(ab);
+//  return 0;
+// }
