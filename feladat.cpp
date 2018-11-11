@@ -1,5 +1,14 @@
 #include <iostream>
-class matrix_base {};
+class matrix_base {
+
+public:
+  matrix_base() {
+    std::cout << "hi" << '\n';
+  }
+};
+
+template<class T, int N, int M, class Cont >
+class helper;
 
 /**
 A simple container tartalmazza a memoriaba lementett matrix ertekeket.
@@ -207,6 +216,16 @@ public:
     return *this;
   }
 
+  template<class Cont2>
+  my_matrix& operator=(const helper<T, N, M, Cont2>& other){
+    for (int i = 0; i < N; ++i)
+      for (int j = 0; j < M; j++)
+      {
+        cont(i,j) = other.getByValue(i,j);
+      }
+    return *this;
+  }
+
   /**
   (i,j). elem konstans referencia szerinti lekerese
   */
@@ -246,69 +265,301 @@ public:
   virtualis osszeadas matrixok kozott
   */
   template<class Other_cont>
-  my_matrix<T, N, M, sum_container<T, Cont, Other_cont> > operator+(const my_matrix<T, N, M, Other_cont>& other){
-    return my_matrix<T, N, M, sum_container<T, Cont, Other_cont> > (sum_container<T, Cont, Other_cont>(this->data(), other.data()));
+  helper<T, N, M, sum_container<T, Cont, Other_cont> > operator+(const helper<T, N, M, Other_cont>& other){
+    return helper<T, N, M, sum_container<T, Cont, Other_cont> > (sum_container<T, Cont, Other_cont>(this->data(), other.data()));
   }
 
   /**
   virtualis osszeadas matrixok kozott (konstans)
   */
   template<class Other_cont>
-  my_matrix<T, N, M, sum_container<T, Cont, Other_cont> > operator+(const my_matrix<T, N, M, Other_cont>& other) const{
-    return my_matrix<T, N, M, sum_container<T, Cont, Other_cont> > (sum_container<T, Cont, Other_cont>(this->data(), other.data()));
+  helper<T, N, M, sum_container<T, Cont, Other_cont> > operator+(const helper<T, N, M, Other_cont>& other) const{
+    return helper<T, N, M, sum_container<T, Cont, Other_cont> > (sum_container<T, Cont, Other_cont>(this->data(), other.data()));
   }
 
   /**
   virtualis kivonas matrixok kozott
   */
   template<class Other_cont>
-  my_matrix<T, N, M, neg_container<T, Cont, Other_cont> > operator-(const my_matrix<T, N, M, Other_cont>& other){
-    return my_matrix<T, N, M, neg_container<T, Cont, Other_cont> > (neg_container<T, Cont, Other_cont>(this->data(), other.data()));
+  helper<T, N, M, neg_container<T, Cont, Other_cont> > operator-(const helper<T, N, M, Other_cont>& other){
+    return helper<T, N, M, neg_container<T, Cont, Other_cont> > (neg_container<T, Cont, Other_cont>(this->data(), other.data()));
   }
 
   /**
   virtualis kivonas matrixok kozott (konstans)
   */
   template<class Other_cont>
-  my_matrix<T, N, M, neg_container<T, Cont, Other_cont> > operator-(const my_matrix<T, N, M, Other_cont>& other) const {
-    return my_matrix<T, N, M, neg_container<T, Cont, Other_cont> > (neg_container<T, Cont, Other_cont>(this->data(), other.data()));
+  helper<T, N, M, neg_container<T, Cont, Other_cont> > operator-(const helper<T, N, M, Other_cont>& other) const {
+    return helper<T, N, M, neg_container<T, Cont, Other_cont> > (neg_container<T, Cont, Other_cont>(this->data(), other.data()));
   }
 
   /**
   virtualis szorzas matrixok kozott
   */
   template<int K, class Other_cont>
-  my_matrix<T, N, K, mul_container<T, Cont, Other_cont, M> > operator*(const my_matrix<T, M, K, Other_cont>& other){
-    return my_matrix<T, N, K, mul_container<T, Cont, Other_cont, M> > (mul_container<T, Cont, Other_cont, M>(this->data(), other.data()));
+  helper<T, N, K, mul_container<T, Cont, Other_cont, M> > operator*(const helper<T, M, K, Other_cont>& other){
+    return helper<T, N, K, mul_container<T, Cont, Other_cont, M> > (mul_container<T, Cont, Other_cont, M>(this->data(), other.data()));
   }
 
   /**
   virtualis szorzas matrixok kozott (konstans)
   */
   template<int K, class Other_cont>
-  my_matrix<T, N, K, mul_container<T, Cont, Other_cont, M> > operator*(const my_matrix<T, M, K, Other_cont>& other) const {
-    return my_matrix<T, N, K, mul_container<T, Cont, Other_cont, M> > (mul_container<T, Cont, Other_cont, M>(this->data(), other.data()));
+  helper<T, N, K, mul_container<T, Cont, Other_cont, M> > operator*(const helper<T, M, K, Other_cont>& other) const {
+    return helper<T, N, K, mul_container<T, Cont, Other_cont, M> > (mul_container<T, Cont, Other_cont, M>(this->data(), other.data()));
   }
 
   /**
   virtualis szorzas matrix es konstans kozott
   */
-  my_matrix<T, N, M, const_mult_container<T, Cont> > operator*(const T other) {
-    return my_matrix<T, N, M, const_mult_container<T, Cont> >(const_mult_container<T, Cont>(other, this->data()));
+  helper<T, N, M, const_mult_container<T, Cont> > operator*(const T other) {
+    return helper<T, N, M, const_mult_container<T, Cont> >(const_mult_container<T, Cont>(other, this->data()));
   }
 
   /**
   virtualis szorzas matrix es konstans kozott (konstans)
   */
-  my_matrix<T, N, M, const_mult_container<T, Cont> > operator*(const T other) const {
-    return my_matrix<T, N, M, const_mult_container<T, Cont> >(const_mult_container<T, Cont>(other, this->data()));
+  helper<T, N, M, const_mult_container<T, Cont> > operator*(const T other) const {
+    return helper<T, N, M, const_mult_container<T, Cont> >(const_mult_container<T, Cont>(other, this->data()));
   }
 
   /**
   virtualis szorzas konstans es matrix kozott
   */
-  friend my_matrix<T, N, M, const_mult_container<T, Cont> > operator*(const T c, const my_matrix<T, N, M, Cont>& mtx) {
+  friend helper<T, N, M, const_mult_container<T, Cont> > operator*(const T c, const helper<T, N, M, Cont>& mtx) {
     return mtx.operator*(c);
+  }
+
+  /**
+  virtualis osszeadas matrixok kozott
+  */
+  template<class Other_cont>
+  helper<T, N, M, sum_container<T, Cont, Other_cont> > operator+(const my_matrix<T, N, M, Other_cont>& other){
+    return helper<T, N, M, sum_container<T, Cont, Other_cont> > (sum_container<T, Cont, Other_cont>(this->data(), other.data()));
+  }
+
+  /**
+  virtualis osszeadas matrixok kozott (konstans)
+  */
+  template<class Other_cont>
+  helper<T, N, M, sum_container<T, Cont, Other_cont> > operator+(const my_matrix<T, N, M, Other_cont>& other) const{
+    return helper<T, N, M, sum_container<T, Cont, Other_cont> > (sum_container<T, Cont, Other_cont>(this->data(), other.data()));
+  }
+
+  /**
+  virtualis kivonas matrixok kozott
+  */
+  template<class Other_cont>
+  helper<T, N, M, neg_container<T, Cont, Other_cont> > operator-(const my_matrix<T, N, M, Other_cont>& other){
+    return helper<T, N, M, neg_container<T, Cont, Other_cont> > (neg_container<T, Cont, Other_cont>(this->data(), other.data()));
+  }
+
+  /**
+  virtualis kivonas matrixok kozott (konstans)
+  */
+  template<class Other_cont>
+  helper<T, N, M, neg_container<T, Cont, Other_cont> > operator-(const my_matrix<T, N, M, Other_cont>& other) const {
+    return helper<T, N, M, neg_container<T, Cont, Other_cont> > (neg_container<T, Cont, Other_cont>(this->data(), other.data()));
+  }
+
+  /**
+  virtualis szorzas matrixok kozott
+  */
+  template<int K, class Other_cont>
+  helper<T, N, K, mul_container<T, Cont, Other_cont, M> > operator*(const my_matrix<T, M, K, Other_cont>& other){
+    return helper<T, N, K, mul_container<T, Cont, Other_cont, M> > (mul_container<T, Cont, Other_cont, M>(this->data(), other.data()));
+  }
+
+  /**
+  virtualis szorzas matrixok kozott (konstans)
+  */
+  template<int K, class Other_cont>
+  helper<T, N, K, mul_container<T, Cont, Other_cont, M> > operator*(const my_matrix<T, M, K, Other_cont>& other) const {
+    return helper<T, N, K, mul_container<T, Cont, Other_cont, M> > (mul_container<T, Cont, Other_cont, M>(this->data(), other.data()));
+  }
+};
+
+
+template<class T, int N, int M, class Cont >
+class helper {
+  /**
+  kontener az adott matrixnak, lehet virtualis vagy fizikai is
+  */
+  Cont cont;
+
+public:
+  /**
+  alapertelemezett konstruktor
+  */
+  helper() {}
+  /**
+  konstruktor virtualizalt elemekhez, itt nincs szükség másolásra, hiszen ha
+  ha fel van szabadítva egy objektum nem hívunk meg rá operációkat
+  */
+  helper(const Cont& other) : cont(other){}
+
+  /**
+  ertekadas operator a simple_container-ekkel elvegzi a virtualis szamitasokat,
+  egeszen az adott "other" objektum kontenereig, majd beallirja ertekul az
+  aktualis objektumnak
+  */
+  template<class Cont2>
+  my_matrix<T, N, M, Cont> & operator=(const helper<T, N, M, Cont2>& other){
+    for (int i = 0; i < N; ++i)
+      for (int j = 0; j < M; j++)
+      {
+        cont(i,j) = other.getByValue(i,j);
+      }
+    return *this;
+  }
+
+  /**
+  (i,j). elem konstans referencia szerinti lekerese
+  */
+  const T& operator()(int i, int j) const{
+    return this->cont(i,j);
+  }
+
+  /**
+  (i,j). elem referencia szerinti lekerese
+  */
+  T& operator()(int i, int j) {
+    return this->cont(i,j);
+  }
+
+  /**
+  az (i,j). elemet érték szerint kéri le, nem referencia szerint
+  */
+  T getByValue(int i, int j) const {
+    return cont(i,j);
+  }
+
+  /**
+  visszaadja a kontener konstans referenciajat
+  */
+  const Cont& data() const {
+    return cont;
+  }
+
+  /**
+  visszaadja a kontener referenciajat
+  */
+  Cont& data(){
+    return cont;
+  }
+
+  /**
+  virtualis osszeadas matrixok kozott
+  */
+  template<class Other_cont>
+  helper<T, N, M, sum_container<T, Cont, Other_cont> > operator+(const helper<T, N, M, Other_cont>& other){
+    return helper<T, N, M, sum_container<T, Cont, Other_cont> > (sum_container<T, Cont, Other_cont>(this->data(), other.data()));
+  }
+
+  /**
+  virtualis osszeadas matrixok kozott (konstans)
+  */
+  template<class Other_cont>
+  helper<T, N, M, sum_container<T, Cont, Other_cont> > operator+(const helper<T, N, M, Other_cont>& other) const{
+    return helper<T, N, M, sum_container<T, Cont, Other_cont> > (sum_container<T, Cont, Other_cont>(this->data(), other.data()));
+  }
+
+  /**
+  virtualis kivonas matrixok kozott
+  */
+  template<class Other_cont>
+  helper<T, N, M, neg_container<T, Cont, Other_cont> > operator-(const helper<T, N, M, Other_cont>& other){
+    return helper<T, N, M, neg_container<T, Cont, Other_cont> > (neg_container<T, Cont, Other_cont>(this->data(), other.data()));
+  }
+
+  /**
+  virtualis kivonas matrixok kozott (konstans)
+  */
+  template<class Other_cont>
+  helper<T, N, M, neg_container<T, Cont, Other_cont> > operator-(const helper<T, N, M, Other_cont>& other) const {
+    return helper<T, N, M, neg_container<T, Cont, Other_cont> > (neg_container<T, Cont, Other_cont>(this->data(), other.data()));
+  }
+
+  /**
+  virtualis szorzas matrixok kozott
+  */
+  template<int K, class Other_cont>
+  helper<T, N, K, mul_container<T, Cont, Other_cont, M> > operator*(const helper<T, M, K, Other_cont>& other){
+    return helper<T, N, K, mul_container<T, Cont, Other_cont, M> > (mul_container<T, Cont, Other_cont, M>(this->data(), other.data()));
+  }
+
+  /**
+  virtualis szorzas matrixok kozott (konstans)
+  */
+  template<int K, class Other_cont>
+  helper<T, N, K, mul_container<T, Cont, Other_cont, M> > operator*(const helper<T, M, K, Other_cont>& other) const {
+    return helper<T, N, K, mul_container<T, Cont, Other_cont, M> > (mul_container<T, Cont, Other_cont, M>(this->data(), other.data()));
+  }
+
+  /**
+  virtualis szorzas matrix es konstans kozott
+  */
+  helper<T, N, M, const_mult_container<T, Cont> > operator*(const T other) {
+    return helper<T, N, M, const_mult_container<T, Cont> >(const_mult_container<T, Cont>(other, this->data()));
+  }
+
+  /**
+  virtualis szorzas matrix es konstans kozott (konstans)
+  */
+  helper<T, N, M, const_mult_container<T, Cont> > operator*(const T other) const {
+    return helper<T, N, M, const_mult_container<T, Cont> >(const_mult_container<T, Cont>(other, this->data()));
+  }
+
+  /**
+  virtualis szorzas konstans es matrix kozott
+  */
+  friend helper<T, N, M, const_mult_container<T, Cont> > operator*(const T c, const helper<T, N, M, Cont>& mtx) {
+    return mtx.operator*(c);
+  }
+
+  template<class Other_cont>
+  helper<T, N, M, sum_container<T, Cont, Other_cont> > operator+(const my_matrix<T, N, M, Other_cont>& other){
+    return helper<T, N, M, sum_container<T, Cont, Other_cont> > (sum_container<T, Cont, Other_cont>(this->data(), other.data()));
+  }
+
+  /**
+  virtualis osszeadas matrixok kozott (konstans)
+  */
+  template<class Other_cont>
+  helper<T, N, M, sum_container<T, Cont, Other_cont> > operator+(const my_matrix<T, N, M, Other_cont>& other) const{
+    return helper<T, N, M, sum_container<T, Cont, Other_cont> > (sum_container<T, Cont, Other_cont>(this->data(), other.data()));
+  }
+
+  /**
+  virtualis kivonas matrixok kozott
+  */
+  template<class Other_cont>
+  helper<T, N, M, neg_container<T, Cont, Other_cont> > operator-(const my_matrix<T, N, M, Other_cont>& other){
+    return helper<T, N, M, neg_container<T, Cont, Other_cont> > (neg_container<T, Cont, Other_cont>(this->data(), other.data()));
+  }
+
+  /**
+  virtualis kivonas matrixok kozott (konstans)
+  */
+  template<class Other_cont>
+  helper<T, N, M, neg_container<T, Cont, Other_cont> > operator-(const my_matrix<T, N, M, Other_cont>& other) const {
+    return helper<T, N, M, neg_container<T, Cont, Other_cont> > (neg_container<T, Cont, Other_cont>(this->data(), other.data()));
+  }
+
+  /**
+  virtualis szorzas matrixok kozott
+  */
+  template<int K, class Other_cont>
+  helper<T, N, K, mul_container<T, Cont, Other_cont, M> > operator*(const my_matrix<T, M, K, Other_cont>& other){
+    return helper<T, N, K, mul_container<T, Cont, Other_cont, M> > (mul_container<T, Cont, Other_cont, M>(this->data(), other.data()));
+  }
+
+  /**
+  virtualis szorzas matrixok kozott (konstans)
+  */
+  template<int K, class Other_cont>
+  helper<T, N, K, mul_container<T, Cont, Other_cont, M> > operator*(const my_matrix<T, M, K, Other_cont>& other) const {
+    return helper<T, N, K, mul_container<T, Cont, Other_cont, M> > (mul_container<T, Cont, Other_cont, M>(this->data(), other.data()));
   }
 };
 
@@ -350,7 +601,7 @@ int main(int argc, char const *argv[]) {
  b(0,0) = 6;
  b(1,0) = 10;
 
- ab = ab*2 - ab * b * a * ab;
+ ab = ab*2 - ab * b * a * ab + b*a;
  printMtx(ab);
  return 0;
 }
